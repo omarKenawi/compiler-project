@@ -46,7 +46,7 @@ mainclassDec:	Public? Class VAR '{' stmt* mainMethod stmt*'}' ->^(ClassDec Publi
 
 stmt    :   (
 	decl -> ^(Decl decl)
-	|ifstmt -> ^(Ifstmt ifstmt)
+	|ifStatement -> ^(Ifstmt ifStatement)
 	|whilestmt -> ^(Whilestmt whilestmt)
 	|forloop -> ^(Forloop forloop)
 	|printStmt ->^(PrintStmt printStmt)
@@ -74,9 +74,12 @@ whilestmt	:
 	'while' '(' condition (AndOr condition)* ')' '{' stmt* '}'
 	;
 	 
+ifStatement:ifstmt (elseIf_rule|ifstmt)* ;
+	 
 ifstmt  :    
-	'if' '(' condition (AndOr condition)* ')'( stmt|'{' stmt+'}') ('else' ( stmt|'{' stmt+'}'))
-	;   
+	'if' '(' condition (AndOr condition)* ')'( stmt|'{' stmt+'}') ('else' ( stmt|'{' stmt+'}'))?
+	;
+elseIf_rule	:'else' 'if''('condition (AndOr condition)*')'( stmt|'{' stmt+'}');
 forloop	:   
 	'for' '(' decl condition (AndOr condition)* SEMICOLON assigment ')' '{' stmt* '}'
 	;
