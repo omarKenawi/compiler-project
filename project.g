@@ -84,14 +84,15 @@ forloop	:
 	'for' '(' decl condition (AndOr condition)* SEMICOLON assigment ')' '{' stmt* '}'
 	;
 assigment:   
-	VAR (change|'=' generalArithExpr) SEMICOLON
+	VAR('[' generalArithExpr']')? (change|'=' generalArithExpr) SEMICOLON
 	; 
 change	:
 	('++'|'--'|('+='|'-=')(NUM))
 	;
 condition:   
-	(factor (RelationalOperators (factor))? )
-	;
+    '!' '(' factor (RelationalOperators factor)? ')'  
+    | factor (RelationalOperators factor)?
+    ;
 type_dec	:	
 	//(Modifier? INT VAR '=' (NUM|VAR) (Operation (NUM|VAR))* SEMICOLON)
 	(Public? type VAR ('=' generalArithExpr)? SEMICOLON)
@@ -105,7 +106,7 @@ generalArithExpr: term (('+' | '-')^  term)*
   catch[NoViableAltException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
   catch[RecognitionException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
   
-term	: factor ( ( '*' | '/' )^ factor)* 
+term	: factor ( ( '*' | '/' )^ factor)*
 	//-> ^(Term factor ( ( '*' | '/' ) factor)*)
 	;
 // catch blocks go first
@@ -115,12 +116,14 @@ term	: factor ( ( '*' | '/' )^ factor)*
 
 factor	:  
 	 New VAR '(' ')'('.'factor '(' factor ')' )* ->^(Factor New VAR '(' ')'('.'factor '(' factor ')' )*)
+	|New INT '[' generalArithExpr ']' ->^(Factor New INT '[' generalArithExpr ']')
 	|VAR ('.'factor '(' factor? ')' )* ->^(Factor VAR('.'factor '(' factor? ')' )*)
 	|This ( '.' factor '(' args? ')' )* ->^(Factor This ( '.'factor '(' args? ')' )* )
-//	|VAR -> ^(Factor VAR)
+	|VAR '.''length' -> ^(Factor VAR '.''length')
 	|NUM -> ^(Factor NUM)
 	| '-'  generalArithExpr -> ^(Factor  '-' generalArithExpr)
 	| '(' generalArithExpr ')' -> ^(Factor  '(' generalArithExpr ')')
+	|VAR '[' generalArithExpr ']' -> ^(Factor VAR '[' generalArithExpr ']')
 	;
 	
 type	:	INT('['']')?|BOOLEAN|VAR;
@@ -140,4 +143,3 @@ RelationalOperators:   '=='|'!='|'>'|'<'|'>='|'<=';
 ML_COMMENT	:	'/*' ( options {greedy=false;} : .)* '*/'+{skip();};
 SL_COMMENT	:	'//' (.)*'\n'+{skip();};
 WhiteSpace:	(' '|'\n'|'\r'|'\t')+{skip();};
-
