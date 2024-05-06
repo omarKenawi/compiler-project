@@ -45,12 +45,13 @@ mainclassDec:	Public? Class VAR '{' stmt* mainMethod stmt*'}' ->^(ClassDec Publi
 
 
 stmt    :   (
-	decl -> ^(Decl decl)
+	assigment -> ^(Assigment assigment)
+	|decl -> ^(Decl decl)
 	|ifStatement -> ^(Ifstmt ifStatement)
 	|whilestmt -> ^(Whilestmt whilestmt)
 	|forloop -> ^(Forloop forloop)
 	|printStmt ->^(PrintStmt printStmt)
-	|assigment -> ^(Assigment assigment)
+	
 	|method -> ^(Method method)	
 	);
 	// catch blocks go first
@@ -115,9 +116,9 @@ term	: factor ( ( '*' | '/' )^ factor)*
   catch[RecognitionException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
 
 factor	:  
-	 New VAR '(' ')'('.'factor '(' factor ')' )* ->^(Factor New VAR '(' ')'('.'factor '(' factor ')' )*)
+	 New VAR '(' ')'('.'factor '(' args? ')' )* ->^(Factor New VAR '(' ')'('.'factor '(' args? ')' )*)
 	|New INT '[' generalArithExpr ']' ->^(Factor New INT '[' generalArithExpr ']')
-	|VAR ('.'factor '(' factor? ')' )* ->^(Factor VAR('.'factor '(' factor? ')' )*)
+	|VAR ('.'factor '(' factor* ')' )* ->^(Factor VAR('.'factor '(' factor* ')' )*)
 	|This ( '.' factor '(' args? ')' )* ->^(Factor This ( '.'factor '(' args? ')' )* )
 	|VAR '.''length' -> ^(Factor VAR '.''length')
 	|NUM -> ^(Factor NUM)
