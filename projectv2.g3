@@ -1,0 +1,105 @@
+grammar ArithmeticExpressions;
+
+options {output=AST;}
+
+tokens {
+    Start;
+    StartgeneralArithExpr;
+    GeneralArithExpr;
+    PrintStmt;
+    Term;
+    Factor;
+    Method;
+    COMMENT;
+    Assigment;
+    Forloop;
+    Whilestmt;
+    Decl;
+    Ifstmt;
+    Double_dec;
+    Type_dec;
+    ClassDec;
+    TYPE;
+    String_Dec;
+}
+
+@members {
+    String s="";
+}
+
+startgeneralArithExpr : multbleClass -> ^(Start multbleClass);
+
+multbleClass : mainclassDec classDec+;
+
+classDec : Public? Class VAR '{' stmt* '}' -> ^(ClassDec Public? Class VAR '{' stmt* '}');
+mainclassDec : Public? Class VAR '{' stmt* mainMethod stmt*'}' -> ^(ClassDec Public? Class VAR '{' stmt* mainMethod stmt* '}');
+
+stmt : (assigment -> ^(Assigment assigment)
+        | decl -> ^(Decl decl)
+        | ifStatement -> ^(Ifstmt ifStatement)
+        | whilestmt -> ^(Whilestmt whilestmt)
+        | forloop -> ^(Forloop forloop)
+        | printStmt -> ^(PrintStmt printStmt)
+        | method -> ^(Method method));
+
+method : ((Public type VAR params '{' stmt* 'return' (VAR | NUM) SEMICOLON'}'));
+mainMethod : Public 'static' VOID 'main''(''String''['']'VAR')''{'stmt*'}';
+params : '('((type VAR) (',' type VAR)*)? ')';
+args : arg (',' arg)*;
+arg : generalArithExpr;
+
+decl : type_dec -> ^(Type_dec type_dec);
+
+printStmt : Print '(' generalArithExpr ')' SEMICOLON;
+
+whilestmt : 'while' '(' factor (AndOr factor)* ')' '{' stmt* '}';
+
+ifStatement : ifstmt ;
+
+ifstmt : 'if' '(' factor (AndOr factor)* ')' (stmt | '{' stmt+ '}') ('else' (stmt | '{' stmt+ '}'))?;
+
+forloop : 'for' '(' decl factor (AndOr factor)* SEMICOLON assigment ')' '{' stmt* '}';
+
+assigment : VAR('[' generalArithExpr']')? (change | '=' generalArithExpr) SEMICOLON;
+
+change : ('++' | '--' | ('+=' | '-=')(NUM));
+condition : VAR (RelationalOperators factor);
+
+
+type_dec : (Public? type VAR ('=' generalArithExpr)? SEMICOLON);
+generalArithExpr : factor (('+' | '-'|'*' | '/')^ factor)*;
+
+factor
+    :    condition -> ^(Factor condition )
+    |  New VAR '(' ')' ('.' factorArgs)* -> ^(Factor New VAR '(' ')' ('.' factorArgs)*)
+    |   New INT '[' generalArithExpr ']' -> ^(Factor New INT '[' generalArithExpr ']')
+    |   This ('.' factorArgs)* -> ^(Factor This ('.' factorArgs)*)
+    |   VAR '.' 'length' -> ^(Factor VAR '.' 'length')
+    |   NUM -> ^(Factor NUM)
+    |   '-' factor -> ^(Factor '-' factor)
+    |   VAR '[' generalArithExpr ']' -> ^(Factor VAR '[' generalArithExpr ']')
+    |   VAR ('.' factorArgs)* -> ^(Factor VAR ('.' factorArgs)*)
+    |   '(' generalArithExpr ')' -> ^(Factor generalArithExpr)
+    |   '!' factor  -> ^(Factor '!' factor )
+    ;
+
+factorArgs : factor '(' args? ')' ;
+
+AndOr : '&&' | '||';
+
+type : INT('['']')? | BOOLEAN | VAR;
+Class : 'class';
+This : 'this';
+New : 'new';
+Public : 'public';
+Print : 'System.out.println';
+INT : 'int';
+VOID : 'void';
+BOOLEAN : 'boolean';
+VAR : ('a'..'z' | 'A'..'Z' | '$' | '_') ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*;
+NUM : ('0'..'9')*;
+SEMICOLON : ';';
+RelationalOperators : '==' | '!=' | '>' | '<' | '>=' | '<=';
+ML_COMMENT : '/*' ( options {greedy=false;} : .)* '*/'+{skip();};
+SL_COMMENT : '//' (.)*'\n'+{skip();};
+WhiteSpace : (' ' | '\n' | '\r' | '\t')+{skip();};
