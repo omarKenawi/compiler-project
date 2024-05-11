@@ -150,7 +150,7 @@ factor
     |  New VAR '(' ')' ('.' factorArgs)* -> ^(Factor New VAR '(' ')' ('.' factorArgs)*)
     |   New INT '[' generalArithExpr ']' -> ^(Factor New INT '[' generalArithExpr ']')
     |   This ('.' factorArgs)* -> ^(Factor This ('.' factorArgs)*)
-    |   VAR '.' 'length' -> ^(Factor VAR '.' 'length')
+    |   VAR '.' 'length' -> ^(Factor )
     |   NUM -> ^(Factor NUM)
     |   '-' factor -> ^(Factor '-' factor)
     |   VAR '[' generalArithExpr ']' -> ^(Factor VAR '[' generalArithExpr ']' )
