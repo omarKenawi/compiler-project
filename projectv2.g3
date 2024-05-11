@@ -153,9 +153,9 @@ factor
     |   VAR '.' 'length' -> ^(Factor VAR '.' 'length')
     |   NUM -> ^(Factor NUM)
     |   '-' factor -> ^(Factor '-' factor)
-    |   VAR '[' generalArithExpr ']' -> ^(Factor VAR '[' generalArithExpr ']')
+    |   VAR '[' generalArithExpr ']' -> ^(Factor VAR '[' generalArithExpr ']' )
     |   VAR ('.' factorArgs)* -> ^(Factor VAR ('.' factorArgs)*)
-    |   '(' generalArithExpr ')'('.'factorArgs)*-> ^(Factor generalArithExpr)
+    |   '(' generalArithExpr ')'('.'factorArgs)*-> ^(Factor '(' generalArithExpr ')'('.'factorArgs)*)
     |   '!' factor  -> ^(Factor '!' factor )
     ;
 catch[MismatchedTokenException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
