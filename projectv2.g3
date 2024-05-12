@@ -54,7 +54,7 @@ catch[RecognitionException e] { s = s +getErrorMessage(e,new String[]{e.input.to
    
 stmt : (assigment -> ^(Assigment assigment)
         | decl -> ^(Decl decl)
-        | ifStatement -> ^(Ifstmt ifStatement)
+        | ifstmt -> ^(Ifstmt ifstmt)
         | whilestmt -> ^(Whilestmt whilestmt)
         | forloop -> ^(Forloop forloop)
         | printStmt -> ^(PrintStmt printStmt)
@@ -100,11 +100,6 @@ catch[NoViableAltException e] { s = s +getErrorMessage(e,new String[]{e.input.to
 catch[RecognitionException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
    
 whilestmt : 'while' '(' factor (AndOr factor)* ')' '{' stmt* '}';
-catch[MismatchedTokenException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
-catch[NoViableAltException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
-catch[RecognitionException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
-   
-ifStatement : ifstmt ;
 catch[MismatchedTokenException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
 catch[NoViableAltException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
 catch[RecognitionException e] { s = s +getErrorMessage(e,new String[]{e.input.toString()})+": "+getErrorHeader(e) +"\n";}
